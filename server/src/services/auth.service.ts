@@ -1,6 +1,9 @@
 import UserModel from "../models/user.model";
-import { UnauthorizedException } from "../utils/app-error";
-import { RegisterSchemaType } from "./../validators/auth.validator";
+import { NotFoundException, UnauthorizedException } from "../utils/app-error";
+import {
+  LoginSchemaType,
+  RegisterSchemaType,
+} from "./../validators/auth.validator";
 
 export const registerService = async (body: RegisterSchemaType) => {
   const { email } = body;
@@ -15,4 +18,17 @@ export const registerService = async (body: RegisterSchemaType) => {
   });
   await newUser.save();
   return newUser;
+};
+
+export const loginService = async (body: LoginSchemaType) => {
+  const { email, password } = body;
+
+  const user = await UserModel.findOne({ email });
+  if (!user) throw new NotFoundException("Email or Password not found");
+
+  const isPasswordValid = await user.comparePassword(password);
+  if (!isPasswordValid)
+    throw new UnauthorizedException("Invaild email or password");
+
+  return user;
 };
