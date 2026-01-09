@@ -3,7 +3,7 @@ import { Env } from "../config/env.config";
 import { Response } from "express";
 import strict from "assert/strict";
 
-type Time = `${number} ${"s" | "m" | "h" | "d"} | "w" | "y"`;
+type Time = `${number} ${"s" | "m" | "h" | "d" | "w" | "y"}`;
 type Cookie = {
   res: Response;
   userId: string;

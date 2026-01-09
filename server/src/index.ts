@@ -3,11 +3,16 @@ import "dotenv/config";
 import express, { Request, Response } from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import passport from "passport";
 import { Env } from "./config/env.config";
 import { asyncHandler } from "./middlewares/asyncHandler.middleware";
 import { HTTPSTATUS } from "./config/http.config";
 import { errorHandler } from "./middlewares/errorhandler.middleware";
 import connectDatabase from "./config/database.config";
+import routes from "./routes";
+
+import "./config/passport.config";
+
 const app = express();
 
 app.use(express.json());
@@ -19,6 +24,7 @@ app.use(
     credentials: true,
   })
 );
+app.use(passport.initialize());
 
 app.get("/", (req, res) => {
   return res.send("Con me mày");
@@ -33,7 +39,7 @@ app.get(
     });
   })
 );
-
+app.use("/api", routes);
 app.use(errorHandler);
 
 app.listen(Env.PORT, async () => {
