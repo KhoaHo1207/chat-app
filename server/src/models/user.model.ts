@@ -1,11 +1,11 @@
-import { compareValue, hashValue } from "#utils/bcrypt.js";
+import { hashValue } from "#utils/bcrypt.js";
 import mongoose, { Document, Schema } from "mongoose";
 
 export interface UserDocument extends Document {
   name: string;
   email: string;
   password: string;
-  avatar?: string | null;
+  avatar: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -27,10 +27,11 @@ const userSchema = new Schema<UserDocument>(
     password: {
       type: String,
       required: true,
+      select: false,
     },
     avatar: {
       type: String,
-      default: null,
+      default: "",
     },
   },
   {
@@ -51,12 +52,6 @@ userSchema.pre("save", async function () {
     this.password = await hashValue(this.password);
   }
 });
-
-userSchema.methods.comparePassword = async function (
-  password: string
-): Promise<boolean> {
-  return await compareValue(password, this.password);
-};
 
 const UserModel = mongoose.model<UserDocument>("User", userSchema);
 

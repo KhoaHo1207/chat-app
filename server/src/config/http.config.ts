@@ -5,6 +5,7 @@ export const HTTP_STATUS_CODES = {
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
   NOT_FOUND: 404,
+  CONFLICT: 409,
   INTERNAL_SERVER_ERROR: 500,
 } as const;
 
@@ -15,6 +16,7 @@ export const HTTP_STATUS_MESSAGES = {
   UNAUTHORIZED: "Unauthorized",
   FORBIDDEN: "Forbidden",
   NOT_FOUND: "Not Found",
+  CONFLICT: "Conflict",
   INTERNAL_SERVER_ERROR: "Internal Server Error",
 } as const;
 
