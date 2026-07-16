@@ -7,6 +7,7 @@ import { Env } from "#config/env.config.js";
 import { errorhandler } from "#middlewares/error-handler.middleware.js";
 import { notFoundHandler } from "#middlewares/not-found.middleware.js";
 import authRouter from "#routes/auth.route.js";
+import userRouter from "#routes/user.route.js";
 
 const app: Express = express();
 
@@ -28,6 +29,7 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/user", userRouter);
 
 app.use(notFoundHandler);
 app.use(errorhandler);
