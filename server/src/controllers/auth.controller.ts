@@ -18,7 +18,7 @@ export const registerController = asyncHandler(
       res,
       statusCode: HTTP_STATUS_CODES.CREATED,
       message: "User registered successfully",
-      data: user,
+      data: { user },
     });
   }
 );
@@ -30,19 +30,19 @@ export const loginController = asyncHandler(
 
     setJwtAuthCookie({
       res,
-      userId: user._id.toString(),
+      userId: String(user._id),
     });
 
     return successResponse({
       res,
       message: "Login successful",
-      data: user,
+      data: { user },
     });
   }
 );
 
 export const logoutController = asyncHandler(
-  async (req: Request, res: Response) => {
+  async (_req: Request, res: Response) => {
     clearJwtAuthCookie(res);
 
     return successResponse({

@@ -10,6 +10,11 @@ export interface UserDocument extends Document {
   updatedAt: Date;
 }
 
+const stripPassword = (_doc: unknown, ret: Record<string, unknown>) => {
+  delete ret.password;
+  return ret;
+};
+
 const userSchema = new Schema<UserDocument>(
   {
     name: {
@@ -37,12 +42,10 @@ const userSchema = new Schema<UserDocument>(
   {
     timestamps: true,
     toJSON: {
-      transform: (doc, ret) => {
-        if (ret) {
-          delete (ret as any).password;
-        }
-        return ret;
-      },
+      transform: stripPassword,
+    },
+    toObject: {
+      transform: stripPassword,
     },
   }
 );

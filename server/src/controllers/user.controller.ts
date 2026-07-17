@@ -8,8 +8,8 @@ export const getMyProfileController = asyncHandler(
   async (req: Request, res: Response) => {
     return successResponse({
       res,
-      message: "Get my profile successful",
-      data: req.user,
+      message: "Profile fetched successfully",
+      data: { user: req.user },
       statusCode: HTTP_STATUS_CODES.OK,
     });
   }
@@ -18,10 +18,11 @@ export const getMyProfileController = asyncHandler(
 export const getUsersController = asyncHandler(
   async (req: Request, res: Response) => {
     const users = await getUsersService(req.user._id.toString());
+
     return successResponse({
       res,
-      message: "Get users successfully",
-      data: users,
+      message: "Users fetched successfully",
+      data: { users },
       statusCode: HTTP_STATUS_CODES.OK,
     });
   }

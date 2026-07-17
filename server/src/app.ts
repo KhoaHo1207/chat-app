@@ -6,7 +6,7 @@ import morgan from "morgan";
 import { Env } from "#config/env.config.js";
 import { errorhandler } from "#middlewares/error-handler.middleware.js";
 import { notFoundHandler } from "#middlewares/not-found.middleware.js";
-import { authRouter, userRouter } from "#routes/index.route.js";
+import { authRouter, userRouter, chatRouter } from "#routes/index.route.js";
 
 const app: Express = express();
 
@@ -29,6 +29,7 @@ app.get("/health", (req, res) => {
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/chat", chatRouter);
 
 app.use(notFoundHandler);
 app.use(errorhandler);

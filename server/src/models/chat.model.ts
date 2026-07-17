@@ -2,9 +2,10 @@ import mongoose, { Document, Schema } from "mongoose";
 
 export interface ChatDocument extends Document {
   participants: mongoose.Types.ObjectId[];
-  lastMessage: mongoose.Types.ObjectId;
+  lastMessage?: mongoose.Types.ObjectId | null;
   isGroup: boolean;
-  groupName?: string;
+  groupName?: string | null;
+  directChatKey?: string | null;
   createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
@@ -19,7 +20,6 @@ const chatSchema = new Schema<ChatDocument>(
         required: true,
       },
     ],
-
     lastMessage: {
       type: Schema.Types.ObjectId,
       ref: "Message",
@@ -33,6 +33,10 @@ const chatSchema = new Schema<ChatDocument>(
       type: String,
       default: null,
     },
+    directChatKey: {
+      type: String,
+      default: null,
+    },
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: "User",
@@ -41,6 +45,18 @@ const chatSchema = new Schema<ChatDocument>(
   },
   {
     timestamps: true,
+  }
+);
+
+chatSchema.index({ participants: 1, updatedAt: -1 });
+chatSchema.index(
+  { directChatKey: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      isGroup: false,
+      directChatKey: { $type: "string" },
+    },
   }
 );
 

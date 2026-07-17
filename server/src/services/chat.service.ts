@@ -1,8 +1,16 @@
 import type { CreateChatSchemaType } from "#validations/index.validation.js";
-import { UserModel, ChatModel } from "#models/index.model.js";
-import { BadRequestError, NotFoundError } from "#utils/app-error.js";
+import { UserModel, ChatModel, MessageModel } from "#models/index.model.js";
+import {
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
+} from "#utils/app-error.js";
 
 const PARTICIPANT_SELECT = "name avatar email";
+const MESSAGE_REPLY_SELECT = "content image sender isDeleted createdAt";
+
+const buildDirectChatKey = (userId: string, participantId: string) =>
+  [userId, participantId].sort().join(":");
 
 const createDirectChat = async (userId: string, participantId: string) => {
   if (participantId === userId) {
@@ -14,24 +22,47 @@ const createDirectChat = async (userId: string, participantId: string) => {
     throw new NotFoundError("User not found");
   }
 
+  const directChatKey = buildDirectChatKey(userId, participantId);
+
   const existingChat = await ChatModel.findOne({
     isGroup: false,
-    participants: { $all: [userId, participantId], $size: 2 },
+    directChatKey,
   }).populate("participants", PARTICIPANT_SELECT);
 
   if (existingChat) {
     return { chat: existingChat, isNew: false };
   }
 
-  const chat = await ChatModel.create({
-    participants: [userId, participantId],
-    isGroup: false,
-    createdBy: userId,
-  });
+  try {
+    const chat = await ChatModel.create({
+      participants: [userId, participantId],
+      isGroup: false,
+      directChatKey,
+      createdBy: userId,
+    });
 
-  await chat.populate("participants", PARTICIPANT_SELECT);
+    await chat.populate("participants", PARTICIPANT_SELECT);
 
-  return { chat, isNew: true };
+    return { chat, isNew: true };
+  } catch (error) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === 11000
+    ) {
+      const raceChat = await ChatModel.findOne({
+        isGroup: false,
+        directChatKey,
+      }).populate("participants", PARTICIPANT_SELECT);
+
+      if (raceChat) {
+        return { chat: raceChat, isNew: false };
+      }
+    }
+
+    throw error;
+  }
 };
 
 const createGroupChat = async (
@@ -94,4 +125,41 @@ export const getChatsService = async (userId: string) => {
     .lean();
 
   return chats;
+};
+
+export const getChatService = async (chatId: string, userId: string) => {
+  const chat = await ChatModel.findById(chatId).populate(
+    "participants",
+    PARTICIPANT_SELECT
+  );
+
+  if (!chat) {
+    throw new NotFoundError("Chat not found");
+  }
+
+  const isParticipant = chat.participants.some(
+    (participant) => participant._id.toString() === userId
+  );
+
+  if (!isParticipant) {
+    throw new ForbiddenError("You are not a participant of this chat");
+  }
+
+  const messages = await MessageModel.find({
+    chatId,
+    isDeleted: false,
+  })
+    .populate("sender", PARTICIPANT_SELECT)
+    .populate({
+      path: "replyTo",
+      select: MESSAGE_REPLY_SELECT,
+      populate: {
+        path: "sender",
+        select: PARTICIPANT_SELECT,
+      },
+    })
+    .sort({ createdAt: 1 })
+    .lean();
+
+  return { chat, messages };
 };

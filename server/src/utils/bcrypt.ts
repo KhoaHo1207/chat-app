@@ -2,9 +2,9 @@ import bcrypt from "bcryptjs";
 
 export const hashValue = async (
   value: string,
-  slat: number = 10
+  saltRounds = 10
 ): Promise<string> => {
-  return await bcrypt.hash(value, slat);
+  return await bcrypt.hash(value, saltRounds);
 };
 
 export const compareValue = async (

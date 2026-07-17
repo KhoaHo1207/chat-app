@@ -3,13 +3,12 @@ import mongoose, { Document, Schema } from "mongoose";
 export interface MessageDocument extends Document {
   chatId: mongoose.Types.ObjectId;
   sender: mongoose.Types.ObjectId;
-  content?: string;
-  image?: string;
-  replyTo?: mongoose.Types.ObjectId;
-  isRead?: boolean;
-  isEdited?: boolean;
-  isDeleted?: boolean;
-
+  content?: string | null;
+  image?: string | null;
+  replyTo?: mongoose.Types.ObjectId | null;
+  isRead: boolean;
+  isEdited: boolean;
+  isDeleted: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -20,6 +19,7 @@ const messageSchema = new Schema<MessageDocument>(
       type: Schema.Types.ObjectId,
       ref: "Chat",
       required: true,
+      index: true,
     },
     sender: {
       type: Schema.Types.ObjectId,
@@ -28,7 +28,7 @@ const messageSchema = new Schema<MessageDocument>(
     },
     content: {
       type: String,
-      required: true,
+      default: null,
     },
     image: {
       type: String,
@@ -56,6 +56,14 @@ const messageSchema = new Schema<MessageDocument>(
     timestamps: true,
   }
 );
+
+messageSchema.pre("validate", function () {
+  if (!this.content && !this.image) {
+    this.invalidate("content", "Message content or image is required");
+  }
+});
+
+messageSchema.index({ chatId: 1, createdAt: 1 });
 
 const MessageModel = mongoose.model<MessageDocument>("Message", messageSchema);
 

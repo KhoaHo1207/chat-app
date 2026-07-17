@@ -3,6 +3,7 @@ import {
   logoutController,
   registerController,
 } from "#controllers/index.controller.js";
+import { authenticate } from "#middlewares/auth.middleware.js";
 import { validateSchema } from "#middlewares/validate-schema.middleware.js";
 import {
   loginSchema,
@@ -18,6 +19,6 @@ authRouter.post(
   registerController
 );
 authRouter.post("/login", validateSchema(loginSchema), loginController);
-authRouter.post("/logout", logoutController);
+authRouter.post("/logout", authenticate, logoutController);
 
 export default authRouter;

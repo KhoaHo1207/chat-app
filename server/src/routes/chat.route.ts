@@ -1,21 +1,32 @@
 import { Router } from "express";
 import {
   createChatController,
+  getChatController,
   getChatsController,
 } from "#controllers/index.controller.js";
 import { authenticate } from "#middlewares/auth.middleware.js";
 import { validateSchema } from "#middlewares/validate-schema.middleware.js";
-import { createChatSchema } from "#validations/index.validation.js";
+import {
+  chatIdSchema,
+  createChatSchema,
+} from "#validations/index.validation.js";
 
-const router: Router = Router();
+const chatRouter: Router = Router();
 
-router.post(
+chatRouter.post(
   "/",
   authenticate,
   validateSchema(createChatSchema),
   createChatController
 );
 
-router.get("/", authenticate, getChatsController);
+chatRouter.get("/", authenticate, getChatsController);
 
-export default router;
+chatRouter.get(
+  "/:id",
+  authenticate,
+  validateSchema(chatIdSchema, "params"),
+  getChatController
+);
+
+export default chatRouter;

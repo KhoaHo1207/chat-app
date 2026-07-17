@@ -29,3 +29,5 @@ export const chatIdSchema = z.object({
 
 export type CreateChatSchemaType = z.infer<typeof createChatSchema>;
 export type ChatIdSchemaType = z.infer<typeof chatIdSchema>;
+
+export { objectIdSchema };
