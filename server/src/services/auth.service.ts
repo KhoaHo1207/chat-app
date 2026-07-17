@@ -1,10 +1,10 @@
-import UserModel, { type UserDocument } from "#models/user.model.js";
+import { UserModel, type UserDocument } from "#models/index.model.js";
 import { ConflictError, UnauthorizedError } from "#utils/app-error.js";
 import { compareValue } from "#utils/bcrypt.js";
 import {
   type LoginSchemaType,
   type RegisterSchemaType,
-} from "#validations/auth.validation.js";
+} from "#validations/index.validation.js";
 
 export const registerService = async (data: RegisterSchemaType) => {
   console.log(data);

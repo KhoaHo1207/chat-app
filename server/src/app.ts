@@ -6,8 +6,7 @@ import morgan from "morgan";
 import { Env } from "#config/env.config.js";
 import { errorhandler } from "#middlewares/error-handler.middleware.js";
 import { notFoundHandler } from "#middlewares/not-found.middleware.js";
-import authRouter from "#routes/auth.route.js";
-import userRouter from "#routes/user.route.js";
+import { authRouter, userRouter } from "#routes/index.route.js";
 
 const app: Express = express();
 

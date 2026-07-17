@@ -1,5 +1,6 @@
 import { HTTP_STATUS_CODES } from "#config/http.config.js";
 import { asyncHandler } from "#middlewares/async-handler.middleware.js";
+import { getUsersService } from "#services/user.service.js";
 import { successResponse } from "#utils/success-response.js";
 import { type Request, type Response } from "express";
 
@@ -9,6 +10,18 @@ export const getMyProfileController = asyncHandler(
       res,
       message: "Get my profile successful",
       data: req.user,
+      statusCode: HTTP_STATUS_CODES.OK,
+    });
+  }
+);
+
+export const getUsersController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const users = await getUsersService(req.user._id.toString());
+    return successResponse({
+      res,
+      message: "Get users successfully",
+      data: users,
       statusCode: HTTP_STATUS_CODES.OK,
     });
   }
